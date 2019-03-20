@@ -22,26 +22,18 @@ class GetVec():
         self.corpus = list(self.get_all_files(self.doc_dir))
         self.corpus.sort()
         self.sentences = list(self.corpus_to_sentences(self.corpus))
-        #sentences = list(self.corpus_to_sentences(self.corpus))
 
         #出現単語リスト（辞書）作成
         self.uniq_words = list(self.make_dictionary(self.sentences))
-        #self.uniq_words = list(self.make_dictionary(sentences))
 
         #各文章での出現回数表作成
-        #self.count_table = self.make_appearance_table(sentences, self.uniq_words)
         self.count_table = self.make_appearance_table(self.sentences, self.uniq_words)
-        #count_table = self.make_appearance_table(self.sentences, self.uniq_words)
 
         #各文章での単語のTF値取得
         self.TF_Value = self.calc_TF(self.sentences, self.uniq_words, self.count_table)
-        #self.TF_Value = self.calc_TF(sentences, self.uniq_words, self.count_table)
-        #TF_Value = self.calc_TF(self.sentences, self.uniq_words, count_table)
-        #self.TF_Value = self.calc_TF(self.sentences, self.uniq_words, count_table)
 
         #各文章での単語のIDF値取得
         self.IDF_Value = self.calc_IDF(self.sentences,self.uniq_words)
-        #self.IDF_Value = self.calc_IDF(sentences,self.uniq_words)
 
         #各文章での単語のTFIDF値計算
         self.TFIDF_Value = self.calc_TFIDF(self.TF_Value,self.IDF_Value)
@@ -62,8 +54,15 @@ class GetVec():
     def get_VEC(self):
         return self.L2_normalize
 
-    #def getSentences(self):
-    #    return self.sentences
+    u''' ファイル出力'''
+    def output_VEC(self):
+        f = open(self.vec_dir, 'w') # 書き込みモードで開く
+        writer = csv.writer(f, lineterminator='\n') # 書き込みファイルの設定
+    
+        writer.writerow(self.uniq_words) 
+        writer.writerows(self.L2_normalize)
+        f.close() # ファイルを閉じる
+
 
     u'''文章ファイル読み込み'''
     def get_all_files(self,directory):
@@ -150,9 +149,7 @@ class GetVec():
    
     u'''TF値計算'''
     def calc_TF(self, sentences,uniq_words,count_table):
-        #def calc_TF(self, sentences,uniq_words):
         TF_Value = []
-        #count_table = count_table
         for iCnt in range(0, len(sentences)):
             TF_Value.append([])
             iCnt2 = 0
@@ -199,15 +196,6 @@ class GetVec():
         for idx, (doc, name) in enumerate(zip(docs, corpus)):
             yield self.split_into_words(doc, name)
 
-    def output_vecs(self, title_vec, target_vec):
-        f = open(OUTPUT_VEC, 'w') # 書き込みモードで開く
-        writer = csv.writer(f, lineterminator='\n') # 書き込みファイルの設定
-    
-        writer.writerow(title_vec) 
-        writer.writerows(target_vec)
-        f.close() # ファイルを閉じる
-
-
 
 if __name__ == '__main__':
 
@@ -216,6 +204,5 @@ if __name__ == '__main__':
     print(wg_doc2vec.get_VEC())
 
     #print('文章群数:' + str(len(wg_doc2vec.sentences)))
-    #print('文章群数:' + str(len(wg_doc2vec.getSentences())))
-    #print('総単語数:' + str(len(uniq_words)))
-    #output_vecs(uniq_words,L2_normalize)
+    #print('総単語数:' + str(len(wg_doc2vec.uniq_words)))
+    wg_doc2vec.output_VEC()
